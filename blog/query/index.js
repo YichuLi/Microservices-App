@@ -12,6 +12,7 @@ app.get("/posts", (req, res) => {
   res.send(posts);
 });
 
+// Receive events from the event bus
 app.post("/events", (req, res) => {
   const { type, data } = req.body;
 
@@ -22,10 +23,24 @@ app.post("/events", (req, res) => {
   }
 
   if (type === "CommentCreated") {
-    const { id, content, postId } = data;
+    const { id, content, postId, status } = data;
 
     const post = posts[postId];
-    post.comments.push({ id, content });
+    post.comments.push({ id, content, status });
+  }
+
+  if (type === "CommentUpdated") {
+    const { id, content, postId, status } = data;
+
+    const post = posts[postId];
+    const comment = post.comments.find((comment) => {
+      // return comment.id === id means that the comment id is equal to the id passed in the request
+      return comment.id === id;
+    });
+
+    // Update the status and content of the comment
+    comment.status = status;
+    comment.content = content;
   }
 
   console.log(posts);
