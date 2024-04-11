@@ -5,8 +5,12 @@ const axios = require("axios");
 const app = express(); // Create an express application
 app.use(bodyParser.json()); // Parse the body of incoming requests as JSON
 
+const events = [];
+
 app.post("/events", (req, res) => {
   const event = req.body;
+
+  events.push(event);
 
   // Send the event to posts, comments, and query services
   axios.post("http://localhost:4000/events", event).catch((err) => {
@@ -23,6 +27,10 @@ app.post("/events", (req, res) => {
     console.log(err.message);
   });
   res.send({ status: "OK" });
+});
+
+app.get("/events", (req, res) => {
+  res.send(events);
 });
 
 app.listen(4005, () => {
